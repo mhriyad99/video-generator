@@ -3,6 +3,10 @@ yt-dlp
 langchain
 langchain_community
 pytube
+torch
+torchvision
+torchaudio
+nltk
 langchain_openai
 python-dotenv
 youtube_transcript_api

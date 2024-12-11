@@ -3,10 +3,39 @@ import re
 import random
 import shutil
 import subprocess
+from urllib.parse import urlparse, parse_qs
+
 from yt_dlp import YoutubeDL
 from pytube import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 from moviepy import VideoFileClip, concatenate_videoclips, AudioFileClip, CompositeVideoClip
+
+
+def get_youtube_video_id(url):
+    """
+    Extract the video ID from a YouTube URL.
+
+    Args:
+        url (str): The YouTube video URL.
+
+    Returns:
+        str: The video ID if found, otherwise None.
+    """
+    try:
+        # Parse the URL
+        parsed_url = urlparse(url)
+        # Extract query parameters
+        query_params = parse_qs(parsed_url.query)
+        # Return the video ID
+        return query_params.get("v", [None])[0]
+    except Exception as e:
+        print(f"Error extracting video ID: {e}")
+        return None
+
+
+def get_video_length(video_path):
+    clip = VideoFileClip(video_path)
+    return clip.duration
 
 
 def sanitize_filename(name):
@@ -72,6 +101,9 @@ def cut_clips(video_path: str, title:str,transcript: list, clips_num: int):
 
 
     output_dir = os.path.join("clips", title)
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+
     os.makedirs(output_dir, exist_ok=True)
 
     # Select random clips from the transcript
