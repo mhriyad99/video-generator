@@ -1,16 +1,15 @@
-from moviepy import VideoFileClip, concatenate_videoclips
+import os
+from src.video_editor.video_utils import download_video, get_video_transcript, cut_clips, join_clips
 
-# List of video file paths to merge
-video_files = ["./assets/CGI Animated Short Film_ _Ice Cream_ by Super Dope _ @CGMeetup.mp4",
-               "./assets/The Restaurant _ Funny Clip _ Mr. Bean Official.mp4"]
+os.makedirs("./downloaded_videos", exist_ok=True)
+os.makedirs("./clips", exist_ok=True)
+video_url = "https://www.youtube.com/watch?v=W7ppd_RY-UE"
 
-# Load all videos as VideoFileClip objects
-clips = [VideoFileClip(file) for file in video_files]
+transcript= get_video_transcript(video_url)
+title = download_video(video_url, download_dir="downloaded_videos")
 
-# Concatenate the video clips
-merged_clip = concatenate_videoclips(clips, method="compose")
+video_path = os.path.join("downloaded_videos", title + ".mp4")
+output_dir = cut_clips(video_path, title, transcript, clips_num=3)
+join_clips(output_dir, "output2.mp4")
 
-# Export the merged video
-output_file = "assets/merged_video.mp4"
-merged_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
 

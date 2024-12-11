@@ -1,1 +1,7 @@
 moviepy
+langchain
+langchain_community
+pytube
+langchain_openai
+python-dotenv
+youtube_transcript_api
