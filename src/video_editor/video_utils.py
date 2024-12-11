@@ -30,26 +30,29 @@ def get_video_info(video_url):
 
 def download_video(video_url, download_dir):
     """Download the video with a sanitized title."""
-    os.makedirs(download_dir, exist_ok=True)
+    try:
+        os.makedirs(download_dir, exist_ok=True)
 
-    # Get video info first
-    info = get_video_info(video_url)
-    video_title = info.get('title')  # Extract the title
+        # Get video info first
+        info = get_video_info(video_url)
+        video_title = info.get('title')  # Extract the title
 
-    # Sanitize the video title
-    sanitized_title = sanitize_filename(video_title)
-    output_path = os.path.join(download_dir, f"{sanitized_title}.%(ext)s")
+        # Sanitize the video title
+        sanitized_title = sanitize_filename(video_title)
+        output_path = os.path.join(download_dir, f"{sanitized_title}.%(ext)s")
 
-    # Download the video with the sanitized title
-    ydl_opts = {
-        'outtmpl': output_path,  # Use the sanitized title for the output file
-        'format': 'bv[height=480]',  # Download video with 480p height
-    }
+        # Download the video with the sanitized title
+        ydl_opts = {
+            'outtmpl': output_path,  # Use the sanitized title for the output file
+            'format': 'bv',  # Download video with 480p height
+        }
 
-    with YoutubeDL(ydl_opts) as ydl:
-        ydl.download([video_url])
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([video_url])
 
-    return sanitized_title
+        return sanitized_title
+    except Exception as e:
+        print(e)
 
 
 def get_video_transcript(video_url:str):
@@ -77,7 +80,7 @@ def cut_clips(video_path: str, title:str,transcript: list, clips_num: int):
     for idx, clip in enumerate(selected_clips):
         print(clip)
         start_time = clip["start"]
-        duration = clip["duration"] + 3
+        duration = clip["duration"] + 5
         output_clip_path = os.path.join(output_dir, f"clip_{idx + 1}.mp4")
 
         # FFmpeg command to cut the clip
