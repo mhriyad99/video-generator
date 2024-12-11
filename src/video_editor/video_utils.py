@@ -6,7 +6,8 @@ import subprocess
 from yt_dlp import YoutubeDL
 from pytube import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
-from moviepy import VideoFileClip, concatenate_videoclips
+from moviepy import VideoFileClip, concatenate_videoclips, AudioFileClip, CompositeVideoClip
+
 
 def sanitize_filename(name):
     """Sanitize a filename by removing invalid characters and quotes."""
@@ -142,4 +143,33 @@ def join_clips(output_dir, final_video_path):
     print(f"Final video created successfully: {final_video_path}")
 
 
+def add_audio_to_video(video_path, audio_path, output_path):
+    """Add audio to a video using moviepy."""
+    video_clip = VideoFileClip(video_path)
+    audio_clip = AudioFileClip(audio_path)
 
+    # Adjust audio duration to match video (optional)
+    audio_clip = audio_clip.set_duration(video_clip.duration)
+
+    final_clip = video_clip.set_audio(audio_clip)
+
+    output_path = f"{output_path}"
+    final_clip.write_videofile(output_path, audio_codec='aac')
+
+
+def add_audio_to_video_ffmpeg(video_path, audio_path, output_path):
+    """Add audio to a video using ffmpeg."""
+    command = [
+        "ffmpeg",
+        "-i", video_path,
+        "-i", audio_path,
+        "-c:v", "copy",
+        "-c:a", "aac",
+        "-strict", "experimental",
+        output_path
+    ]
+    try:
+        subprocess.run(command, check=True)
+        print(f"Video with audio saved as: {output_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error adding audio to video: {e}")
